@@ -2,7 +2,7 @@
 all: sgbase.template
 
 sgbase.template: sgbase.py
-	pylint sgbase.py
+	pylint --reports=n sgbase.py
 	python sgbase.py >sgbase.template
 
 install:
