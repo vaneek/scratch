@@ -11,8 +11,8 @@ Script to create bas service group.
 # from troposphere.ec2 import SecurityGroupRule
 import json
 import yaml ### for yaml output
-from troposphere import Parameter, Template
-from troposphere.ec2 import SecurityGroup
+from troposphere import Parameter, Template, Ref
+from troposphere.ec2 import SecurityGroup, SecurityGroupIngress
 
 t = Template()
 ###
@@ -44,6 +44,13 @@ t.add_resource(SecurityGroup(
     'BaseSecurityGroup',
     GroupDescription='Security group base',
     VpcId='vpc-f5eb1c91',
+))
+t.add_resource(SecurityGroupIngress(
+    'InternalBaseIngress',
+    DependsOn="BaseSecurityGroup",
+    GroupId=Ref("BaseSecurityGroup"),
+    IpProtocol="-1",
+    SourceSecurityGroupId=Ref("BaseSecurityGroup")
 ))
 ###
 ### Outputs...
