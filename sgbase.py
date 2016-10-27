@@ -43,7 +43,7 @@ inrule = t.add_parameter(Parameter(
 t.add_resource(SecurityGroup(
     'BaseSecurityGroup',
     GroupDescription='Security group base',
-    VpcId='vpc-1596667c',
+    VpcId='vpc-f5eb1c91',
 ))
 ###
 ### Outputs...
