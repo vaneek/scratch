@@ -248,7 +248,7 @@ t.add_resource(Instance(
 ### Conditions
 ###
 conditions = {
-    "SetVolumeSize":{
+    "SetBootVolumeSize":{
         "Fn::Not":[{"Fn::Equals":[{"Ref": "BootVolSize"}, ""]}]
     }
 }
