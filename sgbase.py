@@ -12,7 +12,7 @@ Script to create bas service group.
 import json
 import yaml ### for yaml output
 from troposphere import Parameter, Template, Ref
-from troposphere.ec2 import SecurityGroup, SecurityGroupIngress
+from troposphere.ec2 import SecurityGroup, SecurityGroupIngress, SecurityGroupEgress
 
 t = Template()
 ###
@@ -50,6 +50,15 @@ t.add_resource(SecurityGroupIngress(
     DependsOn="BaseSecurityGroup",
     GroupId=Ref("BaseSecurityGroup"),
     IpProtocol="-1",
+    SourceSecurityGroupId=Ref("BaseSecurityGroup")
+))
+t.add_resource(SecurityGroupEgress(
+    'InternalBaseEgress',
+    DependsOn="BaseSecurityGroup",
+    GroupId=Ref("BaseSecurityGroup"),
+    IpProtocol="-1",
+    FromPort="0",
+    ToPort="65535",
     SourceSecurityGroupId=Ref("BaseSecurityGroup")
 ))
 ###
