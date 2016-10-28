@@ -211,7 +211,8 @@ t.add_resource(Instance(
             AssociatePublicIpAddress="false",
             DeviceIndex='0',
             DeleteOnTermination='true',
-            SubnetId=ImportValue("MigPrivateSubnet"),
+            # SubnetId=ImportValue("MigPrivateSubnet"),
+            SubnetId="subnet-614c5e38",
         )
     ],
     BlockDeviceMappings=[
