@@ -25,8 +25,7 @@ t.add_metadata({
 # TODO parameterize subnets and AZs
 ref_MigPrivateSubnet = ImportValue("MigPrivateSubnet")
 ref_MigPublicSubnet = ImportValue("MigPublicSubnet")
-# ref_MigPrivateSubnetAZ = GetAtt(ref_MigPrivateSubnet, "AvailabilityZone")
-ref_MigPrivateSubnetAZ = GetAtt("testsubnet", "AvailabilityZone")
+ref_MigPrivateSubnetAZ = GetAtt(ref_MigPrivateSubnet, "AvailabilityZone")
 ref_MigPublicSubnetAZ = GetAtt(ref_MigPublicSubnet, "AvailabilityZone")
 
 ###
@@ -92,12 +91,6 @@ public_param = t.add_parameter(Parameter(
         "false"
     ],
     ConstraintDescription="Must be 'true' or 'false'."
-))
-# tmp for testing
-subnet_param = t.add_parameter(Parameter(
-    "testsubnet",
-    Default="subnet-614c5e38",
-    Type="String"
 ))
 
 ostype_param = t.add_parameter(Parameter(
@@ -237,7 +230,7 @@ t.add_resource(SecurityGroupEgress(
 t.add_resource(Volume(
     'volume2',
     Condition="AddVolume2",
-    AvailabilityZone=Ref(ref_MigPrivateSubnetAZ),
+    AvailabilityZone="eu-west-1a",
     Size=Ref("Volume2Size"),
     VolumeType="gp2",
     DeletionPolicy="Snapshot",
@@ -249,7 +242,7 @@ t.add_resource(Volume(
 t.add_resource(Volume(
     'volume3',
     Condition="AddVolume3",
-    AvailabilityZone=Ref(ref_MigPrivateSubnetAZ),
+    AvailabilityZone="eu-west-1a",
     Size=Ref("Volume3Size"),
     VolumeType="gp2",
     DeletionPolicy="Snapshot",
@@ -261,7 +254,7 @@ t.add_resource(Volume(
 t.add_resource(Volume(
     'volume4',
     Condition="AddVolume4",
-    AvailabilityZone=Ref(ref_MigPrivateSubnetAZ),
+    AvailabilityZone="eu-west-1a",
     Size=Ref("Volume4Size"),
     VolumeType="gp2",
     DeletionPolicy="Snapshot",
@@ -273,7 +266,7 @@ t.add_resource(Volume(
 t.add_resource(Volume(
     'volume5',
     Condition="AddVolume5",
-    AvailabilityZone=Ref(ref_MigPrivateSubnetAZ),
+    AvailabilityZone="eu-west-1a",
     Size=Ref("Volume5Size"),
     VolumeType="gp2",
     DeletionPolicy="Snapshot",
@@ -285,7 +278,7 @@ t.add_resource(Volume(
 t.add_resource(Volume(
     'volume6',
     Condition="AddVolume6",
-    AvailabilityZone=Ref(ref_MigPrivateSubnetAZ),
+    AvailabilityZone="eu-west-1a",
     Size=Ref("Volume6Size"),
     VolumeType="gp2",
     DeletionPolicy="Snapshot",
