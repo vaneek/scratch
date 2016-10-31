@@ -7,7 +7,7 @@ from troposphere import FindInMap, Tags
 from troposphere import Parameter, Ref, Template, ImportValue
 from troposphere import If, Join
 from troposphere.ec2 import SecurityGroup, NetworkInterfaceProperty, Instance
-from troposphere.ec2 import SecurityGroupIngress, SecurityGroupEgress
+from troposphere.ec2 import SecurityGroupIngress, SecurityGroupEgress, Volume
 from troposphere.iam import Role, InstanceProfile
 from awacs.aws import Allow, Statement, Principal, Policy
 from awacs.sts import AssumeRole
@@ -123,6 +123,36 @@ t.add_parameter(Parameter(
     Description="Enter boot volume size in GB, otherwise default for chosen AMI will be used",
     Default=""
 ))
+t.add_parameter(Parameter(
+    "Volume2Size",
+    Type="String",
+    Description="Enter volume size in GB, otherwise empty for none",
+    Default=""
+))
+t.add_parameter(Parameter(
+    "Volume3Size",
+    Type="String",
+    Description="Enter volume size in GB, otherwise empty for none",
+    Default=""
+))
+t.add_parameter(Parameter(
+    "Volume4Size",
+    Type="String",
+    Description="Enter volume size in GB, otherwise empty for none",
+    Default=""
+))
+t.add_parameter(Parameter(
+    "Volume5Size",
+    Type="String",
+    Description="Enter volume size in GB, otherwise empty for none",
+    Default=""
+))
+t.add_parameter(Parameter(
+    "Volume6Size",
+    Type="String",
+    Description="Enter volume size in GB, otherwise empty for none",
+    Default=""
+))
 
 ###
 ### Mappings
@@ -131,9 +161,9 @@ t.add_parameter(Parameter(
 ### AMI reference (windows,amazon are gp2)
 t.add_mapping(
     "AWSRegionOS2AMI", {
-        "eu-west-1": {"windows": "ami-9b81f8e8", "sqlserver": "ami-9b81f8e8", \
+        "eu-west-1": {"windows": "ami-55084526", "sqlserver": "ami-1f08456c", \
         "amazon": "ami-d41d58a7"},
-        "eu-central-1": {"windows": "ami-7248ba1d", "sqlserver": "ami-7248ba1d", \
+        "eu-central-1": {"windows": "ami-0c34ca63", "sqlserver": "ami-7e33cd11", \
         "amazon": "ami-0044b96f"}
     }
 )
@@ -194,6 +224,67 @@ t.add_resource(SecurityGroupEgress(
     SourceSecurityGroupId=Ref("BaseSecurityGroup")
 ))
 
+t.add_resource(Volume(
+    'volume2',
+    Condition="AddVolume2",
+    AvailabilityZone="eu-central-1a",
+    Size=Ref("Volume2Size"),
+    VolumeType="gp2",
+    DeletionPolicy="Snapshot",
+    Tags=Tags(
+        Name=Ref("HostName"),
+        Application=Join(":", [Ref("Owner"), Ref("Project"), Ref("Application")])
+    ),
+))
+t.add_resource(Volume(
+    'volume3',
+    Condition="AddVolume3",
+    AvailabilityZone="eu-central-1a",
+    Size=Ref("Volume3Size"),
+    VolumeType="gp2",
+    DeletionPolicy="Snapshot",
+    Tags=Tags(
+        Name=Ref("HostName"),
+        Application=Join(":", [Ref("Owner"), Ref("Project"), Ref("Application")])
+    ),
+))
+t.add_resource(Volume(
+    'volume4',
+    Condition="AddVolume4",
+    AvailabilityZone="eu-central-1a",
+    Size=Ref("Volume4Size"),
+    VolumeType="gp2",
+    DeletionPolicy="Snapshot",
+    Tags=Tags(
+        Name=Ref("HostName"),
+        Application=Join(":", [Ref("Owner"), Ref("Project"), Ref("Application")])
+    ),
+))
+t.add_resource(Volume(
+    'volume5',
+    Condition="AddVolume5",
+    AvailabilityZone="eu-central-1a",
+    Size=Ref("Volume5Size"),
+    VolumeType="gp2",
+    DeletionPolicy="Snapshot",
+    Tags=Tags(
+        Name=Ref("HostName"),
+        Application=Join(":", [Ref("Owner"), Ref("Project"), Ref("Application")])
+    ),
+))
+t.add_resource(Volume(
+    'volume6',
+    Condition="AddVolume6",
+    AvailabilityZone="eu-central-1a",
+    Size=Ref("Volume6Size"),
+    VolumeType="gp2",
+    DeletionPolicy="Snapshot",
+    Tags=Tags(
+        Name=Ref("HostName"),
+        Application=Join(":", [Ref("Owner"), Ref("Project"), Ref("Application")])
+    ),
+))
+
 t.add_resource(Instance(
     "ec2server",
     ImageId=FindInMap("AWSRegionOS2AMI", Ref("AWS::Region"), Ref("OsType")),
@@ -215,6 +306,7 @@ t.add_resource(Instance(
             SubnetId="subnet-614c5e38",
         )
     ],
+    # TODO Add conditional for DeviceName, ie windows or amazon linux.
     BlockDeviceMappings=[
         If(
             "SetBootVolumeSize",
@@ -228,8 +320,13 @@ t.add_resource(Instance(
             Ref("AWS::NoValue")
         )
     ],
-    # Volumes=[If("DeployEBS", {"VolumeId": Ref(second_volume), "Device": "xvdb"},
-    #  Ref("AWS::NoValue"))],
+    Volumes=[
+        If("AddVolume2", {"VolumeId": Ref("volume2"), "Device": "xvdb"}, Ref("AWS::NoValue")),
+        If("AddVolume3", {"VolumeId": Ref("volume3"), "Device": "xvdc"}, Ref("AWS::NoValue")),
+        If("AddVolume4", {"VolumeId": Ref("volume4"), "Device": "xvdd"}, Ref("AWS::NoValue")),
+        If("AddVolume5", {"VolumeId": Ref("volume5"), "Device": "xvde"}, Ref("AWS::NoValue")),
+        If("AddVolume6", {"VolumeId": Ref("volume6"), "Device": "xvdf"}, Ref("AWS::NoValue"))
+    ],
     Tags=Tags(
         Name=Ref("HostName"),
         Application=Join(":", [Ref("Owner"), Ref("Project"), Ref("Application")])
@@ -251,6 +348,21 @@ t.add_resource(Instance(
 conditions = {
     "SetBootVolumeSize":{
         "Fn::Not":[{"Fn::Equals":[{"Ref": "BootVolSize"}, ""]}]
+    },
+    "AddVolume2":{
+        "Fn::Not":[{"Fn::Equals":[{"Ref": "Volume2Size"}, ""]}]
+    },
+    "AddVolume3":{
+        "Fn::Not":[{"Fn::Equals":[{"Ref": "Volume3Size"}, ""]}]
+    },
+    "AddVolume4":{
+        "Fn::Not":[{"Fn::Equals":[{"Ref": "Volume4Size"}, ""]}]
+    },
+    "AddVolume5":{
+        "Fn::Not":[{"Fn::Equals":[{"Ref": "Volume5Size"}, ""]}]
+    },
+    "AddVolume6":{
+        "Fn::Not":[{"Fn::Equals":[{"Ref": "Volume6Size"}, ""]}]
     }
 }
 
