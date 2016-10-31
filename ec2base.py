@@ -26,7 +26,7 @@ t.add_metadata({
 ref_MigPrivateSubnet = ImportValue("MigPrivateSubnet")
 ref_MigPublicSubnet = ImportValue("MigPublicSubnet")
 # ref_MigPrivateSubnetAZ = GetAtt(ref_MigPrivateSubnet, "AvailabilityZone")
-ref_MigPrivateSubnetAZ = GetAtt("subnet-614c5e38", "AvailabilityZone")
+ref_MigPrivateSubnetAZ = GetAtt("testsubnet", "AvailabilityZone")
 ref_MigPublicSubnetAZ = GetAtt(ref_MigPublicSubnet, "AvailabilityZone")
 
 ###
@@ -92,6 +92,12 @@ public_param = t.add_parameter(Parameter(
         "false"
     ],
     ConstraintDescription="Must be 'true' or 'false'."
+))
+# tmp for testing
+subnet_param = t.add_parameter(Parameter(
+    "testsubnet",
+    Default="subnet-614c5e38",
+    Type="String"
 ))
 
 ostype_param = t.add_parameter(Parameter(
