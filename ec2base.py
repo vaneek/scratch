@@ -5,7 +5,7 @@ Script to create base ec2 instance template.
 """
 from troposphere import FindInMap, Tags
 from troposphere import Parameter, Ref, Template, ImportValue
-from troposphere import If, Join
+from troposphere import If, Join, GetAtt
 from troposphere.ec2 import SecurityGroup, NetworkInterfaceProperty, Instance
 from troposphere.ec2 import SecurityGroupIngress, SecurityGroupEgress, Volume
 from troposphere.iam import Role, InstanceProfile
@@ -22,8 +22,12 @@ t.add_metadata({
     "Version": "v1.0",
 })
 
+# TODO parameterize subnets and AZs
 ref_MigPrivateSubnet = ImportValue("MigPrivateSubnet")
 ref_MigPublicSubnet = ImportValue("MigPublicSubnet")
+# ref_MigPrivateSubnetAZ = GetAtt(ref_MigPrivateSubnet, "AvailabilityZone")
+ref_MigPrivateSubnetAZ = GetAtt("subnet-614c5e38", "AvailabilityZone")
+ref_MigPublicSubnetAZ = GetAtt(ref_MigPublicSubnet, "AvailabilityZone")
 
 ###
 ### parameters
@@ -227,7 +231,7 @@ t.add_resource(SecurityGroupEgress(
 t.add_resource(Volume(
     'volume2',
     Condition="AddVolume2",
-    AvailabilityZone="eu-central-1a",
+    AvailabilityZone=Ref(ref_MigPrivateSubnetAZ),
     Size=Ref("Volume2Size"),
     VolumeType="gp2",
     DeletionPolicy="Snapshot",
@@ -239,7 +243,7 @@ t.add_resource(Volume(
 t.add_resource(Volume(
     'volume3',
     Condition="AddVolume3",
-    AvailabilityZone="eu-central-1a",
+    AvailabilityZone=Ref(ref_MigPrivateSubnetAZ),
     Size=Ref("Volume3Size"),
     VolumeType="gp2",
     DeletionPolicy="Snapshot",
@@ -251,7 +255,7 @@ t.add_resource(Volume(
 t.add_resource(Volume(
     'volume4',
     Condition="AddVolume4",
-    AvailabilityZone="eu-central-1a",
+    AvailabilityZone=Ref(ref_MigPrivateSubnetAZ),
     Size=Ref("Volume4Size"),
     VolumeType="gp2",
     DeletionPolicy="Snapshot",
@@ -263,7 +267,7 @@ t.add_resource(Volume(
 t.add_resource(Volume(
     'volume5',
     Condition="AddVolume5",
-    AvailabilityZone="eu-central-1a",
+    AvailabilityZone=Ref(ref_MigPrivateSubnetAZ),
     Size=Ref("Volume5Size"),
     VolumeType="gp2",
     DeletionPolicy="Snapshot",
@@ -275,7 +279,7 @@ t.add_resource(Volume(
 t.add_resource(Volume(
     'volume6',
     Condition="AddVolume6",
-    AvailabilityZone="eu-central-1a",
+    AvailabilityZone=Ref(ref_MigPrivateSubnetAZ),
     Size=Ref("Volume6Size"),
     VolumeType="gp2",
     DeletionPolicy="Snapshot",
